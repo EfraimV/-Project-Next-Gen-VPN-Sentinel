@@ -1,0 +1,15 @@
+- name: "ENFORCE VPN SECURITY"
+  hosts: vpn_servers
+  tasks:
+    - name: "DISABLE WEAK CIPHERS (OpenVPN)"
+      ansible.builtin.lineinfile:
+        path: /etc/openvpn/server.conf
+        regexp: "^cipher "
+        line: "cipher AES-256-GCM"
+
+    - name: "ENABLE WIREGUARD FIREWALLING"
+      community.general.ufw:
+        rule: deny
+        from_ip: "{{ item }}"
+        port: 51820
+      loop: "{{ untrusted_countries }}"
